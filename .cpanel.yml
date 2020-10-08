@@ -2,4 +2,4 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/dparhiku/public_html/chat
-    - /bin/cp -R /* $DEPLOYPATH
+      - /bin/cp -R build/* $DEPLOYPATH

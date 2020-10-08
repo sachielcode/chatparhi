@@ -9,7 +9,7 @@ var express = require('express'),
   mysql = require('mysql'),
   events = require('events'),
   serverEmitter = new events.EventEmitter();
-server.listen(65432);
+server.listen(process.env.APP_PORT);
 
 app.set(
   'views',
