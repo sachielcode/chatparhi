@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <link rel="stylesheet" href="css/chat.css"/>
+	<link rel="stylesheet" href="js/jquery-ui-1.10.4.custom/css/ui-lightness/jquery-ui-1.10.4.custom.css"/>
+	<script src="js/jquery.js"></script>
+	<script src="js/jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.js"></script>
+	 <!-- <script src="js/jquery-1.9.1.js"></script>-->
+	<script src="js/jquery.validate.js"></script>
+  </head>
+<body>
+	<div id="contechats">
+		<h1>Chat atenci&oacute;n a clientes</h1>
+		<!--<div id="cerrardefini"><img src="imagenes/cerrarchats.png"/></div>-->
+		<div class="contefondochat">
+		<div id="fondoconten">
+			<img src="imagenes/chica.png"/>
+			<form id="chatnode" method="post" action="/conversacion">
+			<p id="nodisponible">Por el momento nuestros agentes no estan disponibles. Le invitamos a dejar su mensaje o reintente m&aacute;s tarde.</p>
+				<div class="rowschat"><input name="nombre" id="nombresp" placeholder="Nombre" class="required" /></div>
+				<div class="rowschat"><input name="correo" id="correop" placeholder="Correo Electronico" class="required email" /></div>
+				<div class="rowschat activa_r"><input name="asunto" id="asuntop" placeholder="Asunto" />
+				</div>
+				<div class="rowschats1"><textarea id="mensaje_send" name="mensaje_send"  placeholder="Mensaje"></textarea></div>
+				<div id="captchat" class="rowschat">
+					<div id="centracapt">
+						<div id="recaptcha" class="recaptcha"  title="Cambiar texto" onclick="javascript:recargarCaptcha();"></div>
+						<img src="http://destinosparhikuni.no-ip.org:8081/chatparhi/plugins/captcha/securimage_show.php" alt="Codigo"  border="0" id="codecatch" />
+						<input name="captc" id="captc" />
+						<div class="incorrecto"></div>
+					</div>
+				</div>
+				<div id="chatahora" class="btnchats">Chatear ahora</div>
+				<div id="enviamensaj" class="btnchats">Enviar mensaje</div>
+			</form>	
+				<p><b>Horarios de atenci&oacute;n:</b></p>
+				<p>Lunes a viernes de 7am a 10pm</p>
+				<p>Sábado de 8am a 4pm</p>
+				<p>Domingo de 12pm a 8pm</p>
+				<div id="redeschat">
+					<a target="_blank" href="http://www.facebook.com/DestinosParhikuni"><img src="imagenes/face.png"/></a>
+					<a target="_blank" href="http://twitter.com/DParhikuni"><img src="imagenes/tweet.png"/></a>
+					<a target="_blank" href="http://www.youtube.com/user/destinosparhikuni"><img src="imagenes/youtube.png"/></a>
+				</div>
+		</div>
+		</div>
+	</div>
+	<input name="men_e" id="men_e" type="hidden" value="<%= enviado_men %>" />
+	<input name="estado" id="estado" type="hidden" value="" />
+	<input name="nombre_usu" id="nombre_usu" type="hidden" value="<%= nombre_usu %>" />
+	<input name="correo_usu" id="correo_usu" type="hidden" value="<%= correo_usu %>" />
+	<input name="msg" id="msg" type="hidden" value="<%= msg %>" />
+	<div id="mensaje_seenvio" class="mensaje_seenvio" title="Mensaje Enviado" style="display:none;">
+		
+	</div>
+	<input id="disponi" type="hidden" name="disponi" value="<%= disponibilidad %>" />
+<script>
+	$(document).ready(function(){
+		var disp=$('#disponi').val();
+		var exito=$('#men_e').val();
+
+		/****************SE CONDICIONA LA VISTA DE USUARIO INICIAL DEPENDIENDO SI ESTA CONECTADA O NO LA PERSONA DE RESERVACIONES****************/
+		if(disp!="disponible"){
+			$('.activa_r').css('display','none');
+			$('#chatahora').css('display','none');
+			$('#enviamensaj').css('display','block');
+			$('.rowschats1').css('display','block');
+			$('#nodisponible').css('display','block');
+			$('#asuntop').removeClass('required');
+			$('#mensaje_send').addClass('required');
+			$('#estado').val(1);
+		}else{
+			$('.activa_r').css('display','block');
+			$('#chatahora').css('display','block');
+			$('#enviamensaj').css('display','none');
+			$('.rowschats1').css('display','none');
+			$('#nodisponible').css('display','none');
+			$('#mensaje_send').removeClass('required');
+			$('#asuntop').addClass('required');
+			$('#estado').val(0);
+		}
+		
+		/****************************************NOTIFICA AL USUARIO QUE SE HA ENVIADO SU MENSAJE********************************************/
+		if(exito!=""){
+			$('#mensaje_seenvio').text('Tu mensaje ha sido enviado,nos comunicaremos contigo en el menor tiempo posible. Gracias por contactarnos.');
+			$('#mensaje_seenvio').dialog({
+				modal:true,
+				resizable:false,
+				show:"scale",
+				hide:"puff"
+			});
+			
+			var nombre = $('#nombre_usu').val();
+			var correo = $('#correo_usu').val();
+			var mensaje = $('#msg').val();
+			
+			$.ajax({
+				url: 'http://destinosparhikuni.no-ip.org:8081/chatparhi/funciones/enviarcorreo.php',	
+				dataType:"jsonp",
+				data:"nombre="+nombre+"&correo="+correo+"&mensaje="+mensaje,
+				jsonpCallback: "datos",
+					success: function(data) {
+						console.log(data.enviado);	
+					}
+			});
+			
+			$('#nombre_usu').val("");
+			$('#correo_usu').val("");
+			$('#msg').val("");	
+		}
+
+		$("#chatahora,#enviamensaj").click(function(){
+			$('#captchat').css('display','block');
+			$("#chatnode").submit();	
+		});	
+
+		$('#chatnode').validate({
+			submitHandler: function(form) { 
+			var codigo = $('#captc').val();
+			$.ajax({
+				url: 'http://destinosparhikuni.no-ip.org:8081/chatparhi/validacaptcha.php',	
+				dataType:"jsonp",
+				data:"codigo="+codigo,
+				jsonpCallback: "datos",
+					success: function(data) {
+						if(data.error=="Correcto"){
+							form.submit();		
+						}else{
+							$('.incorrecto').html(data.error);
+						}
+					}
+			});
+			
+				
+			}
+		});
+	});
+	
+	function recargarCaptcha(){
+	   $("#codecatch").attr("src","http://destinosparhikuni.no-ip.org:8081/chatparhi/plugins/captcha/securimage_show.php?" + Math.random());
+	   return false;
+	}
+
+</script>	
+	
+</body>
+</html>

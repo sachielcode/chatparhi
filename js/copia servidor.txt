@@ -1,0 +1,227 @@
+/*--creacion y ejecucion del servidor--*/
+var express = require('express'), 
+app = express(),
+bodyParser= require('body-Parser'),
+server = require('http').createServer(app),
+md5 = require('MD5'),
+/*_= require("underscore"),*/
+io = require('socket.io').listen(server), 
+mysql = require('mysql'),
+events = require('events'),
+serverEmitter = new events.EventEmitter();
+server.listen(8888);
+
+  
+  app.set('views', __dirname + '/views');/*donde se encuentran las vistas de la aplicacion*/
+  app.engine('html', require('ejs').renderFile);
+  app.use(express.static(__dirname + '/'));
+
+var clientes_conect= {};
+var rooms= {};
+/*var idreserva={};*/
+/*--conexion a la base de datos--*/
+var bdChat = mysql.createConnection({
+	user: "sperez",
+	password: "sp3r3z",
+	database: "chat",
+	host: "172.17.1.10",
+	port: "3306",
+});
+
+	app.use(bodyParser.urlencoded({ extended: true }));
+	/*renderizacion de paginas*/
+	app.get('/', function(req, res){
+		res.render('index.html');
+	});
+
+	app.get('/ingresar', function(req, res){
+		res.render('ingresar.html',{
+		'errors':""
+		});
+	});
+
+	/*envio de post de cada uno de los formularios*/
+	app.post('/login', function(req, res){
+	var nombre_reservacion = req.body.nombresre;
+	var password_reservacion = md5(req.body.passwordre);
+	loguear="SELECT * from disponibilidad WHERE Asistente='"+nombre_reservacion+"' and aPassword='"+password_reservacion+"'";
+		bdChat.query(loguear, function(error, rows){  
+			
+			if(error){
+				console.log("Error: "+error.message);
+				throw error;
+			}else{
+				if(rows!=""){
+					actualizar = "UPDATE disponibilidad SET disp = 1 WHERE Asistente='"+nombre_reservacion+"' and aPassword='"+password_reservacion+"'";
+					bdChat.query(actualizar, function(error, rows1){
+						if(error){
+							console.log("Error: "+error.message);
+							throw error;
+						}else{
+							res.render('reservaciones.html',{
+								'nombrereservaciones': nombre_reservacion,
+								'fotoreservaciones':rows[0].aFoto,
+								'aceptacion':'aceptado'
+							});
+						}
+					});							
+				}else{
+					var errores="error";
+					res.render('ingresar.html',{
+						'errors':errores
+					});
+				}
+			}
+		});
+	});
+/**************************************************/	
+app.post('/conversacion', function(req, res){
+	var nombre=req.body.nombre;
+	var correo=req.body.correo;
+	var asunto=req.body.asunto;
+	
+		var fecha = new Date();
+		var hrs = fecha.getHours();	
+		var min = fecha.getMinutes();
+		var seg = fecha.getSeconds();
+		var Hora = hrs+":"+min+":"+seg;
+		
+		var dia = fecha.getDate();
+		var mes = fecha.getMonth() +1;
+		var year = fecha.getFullYear();
+		var Fechaingreso = year+"-"+mes+"-"+dia+" "+Hora;
+
+	disp_reservacion="SELECT * from disponibilidad WHERE disp=1";
+	bdChat.query(disp_reservacion, function(error, rows){
+		if(rows!=""){
+		select_usu="SELECT * from conversaciones WHERE Cliente='"+nombre+"' and emailCliente='"+correo+"' and asunto='"+asunto+"' and lConectado=1";
+		bdChat.query(select_usu, function(error, rows1){
+			if(rows1!=""){
+				res.render('conversacion.html',{
+					'nombres':nombre,
+					'correos':correo,
+					'asuntos':asunto,
+					'clave':rows1[0].clave,
+					'reservaciones':rows[0].Asistente,
+					'fotoreserva':rows[0].aFoto,
+					'ingreso':'aceptado'
+				});
+			}else{
+				insert_usu="INSERT INTO conversaciones(asistente, empresa, Cliente, fecha, conversacion, emailCliente, asunto, puertoAsistente,lConectado) values ('"+rows[0].Asistente+"','Destinos Parhikuni','"+nombre+"','"+Fechaingreso+"','','"+correo+"','"+asunto+"','1030','1')";
+				bdChat.query(insert_usu, function(error, rows2){
+				
+					usu_insertados="SELECT * from conversaciones WHERE Cliente='"+nombre+"' and emailCliente='"+correo+"' and asunto='"+asunto+"' and lConectado=1";
+					bdChat.query(usu_insertados, function(error, rows3){
+						res.render('conversacion.html',{
+							'nombres':nombre,
+							'correos':correo,
+							'asuntos':asunto,
+							'clave':rows3[0].clave,
+							'reservaciones':rows[0].Asistente,
+							'fotoreserva':rows[0].aFoto,
+							'ingreso':'aceptado'
+						});
+					});
+					
+				}); 
+			}
+			
+		});
+			
+		}/*else{
+			res.render('enviar.html',{
+				'nombres':nombre,
+				'correos':correo,
+				'asuntos':asunto
+			});
+		}*/	
+	});	
+});
+//Sockets events con socket.io
+io.sockets.on('connection', function(socket){
+	/**********Ingreso a reservaciones*********/
+		socket.on('adduser',function(nombre_usuario,tipo,nombre_reservacion){
+			socket.nombre_usuario = nombre_usuario;
+			clientes_conect[nombre_usuario] = nombre_usuario;
+			rooms[nombre_usuario] = nombre_usuario;
+			socket.join(nombre_usuario);
+				if(tipo=="u"){
+					socket.emit('updatechat','Te acabas de conectar como: ' + nombre_usuario);	
+				}
+			io.sockets.emit('updaterooms', rooms, clientes_conect);	
+			socket.room = nombre_usuario;
+		});
+		
+		socket.on('menuConectados', function(dato){
+		usu_conectados="SELECT clave, Asistente, Cliente, emailCliente, asunto, lConectado from conversaciones WHERE lConectado=1";
+			bdChat.query(usu_conectados, function(error, rows){
+				if(rows!=""){
+					socket.broadcast.emit('usersconect', rows);
+				}else{
+					socket.emit('updatereservaciones',dato);
+				}		
+			});			
+		});	
+		
+		/*Envio de mensajes de usuario a reservaciones*/
+		socket.on('sendchat', function(mensaje, clave_usuario,num_mensaje){
+			usuarios_select ="SELECT clave, Asistente, Cliente from conversaciones WHERE lConectado=1 and clave="+clave_usuario;
+			bdChat.query(usuarios_select, function(error, rows){
+				if(error){
+					console.log("Error: "+error.message);
+					throw error;
+				}else{
+				var nombre = rows[0].Cliente;
+					socket.broadcast.emit('totalmensajes',clave_usuario,nombre,num_mensaje);
+					socket.broadcast.emit('updatemensaje', mensaje, rows);
+				}	
+			});			
+		});
+		
+		/*Envio de mensajes de reservaciones a usuarios*/
+		socket.on('sendchat_usuario', function(men, nombre_reservaciones, usuario_conversando){
+			socket.broadcast.emit('updatemensajeausuario', men, nombre_reservaciones, usuario_conversando);			
+		});
+		
+		socket.on('switchroom', function(newroom){
+			socket.join(newroom);
+			socket.room = newroom;
+			socket.emit('updaterooms', rooms, newroom);
+		});
+		
+		/*mensajes a guardar*/
+		socket.on('guardamensajes',function(clave_usuario,men){
+			guarda_conversacion = "UPDATE conversaciones SET conversacion = '"+men+"' WHERE clave = "+clave_usuario;
+			bdChat.query(guarda_conversacion);
+		});
+		
+		/*Fuerzan a desconectar a un usuarios*/
+		socket.on('desconectar',function(id, cliente){
+			delete clientes_conect[socket.cliente];
+			//console.log(clientes_conect[socket.nombre_usuario]);
+				actualiza_estado = "UPDATE conversaciones SET lconectado = 0 WHERE clave = "+id;
+				bdChat.query(actualiza_estado);
+			io.sockets.emit('updaterooms', clientes_conect);
+			socket.leave(socket.room);
+		});
+		
+		/*Cuando se desconecta un usuario*/
+		socket.on('disconnect', function(){
+			delete clientes_conect[socket.nombre_usuario];
+			io.sockets.emit('updaterooms', clientes_conect);
+			actualiza_estado = "UPDATE conversaciones SET lconectado = 0 WHERE clave = "+socket.nombre_usuario;
+				bdChat.query(actualiza_estado);
+				socket.leave(socket.room);
+		});
+		
+		
+		
+		
+		
+		
+		
+		
+});
+
+
+   

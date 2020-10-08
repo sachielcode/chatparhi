@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+      <link rel="stylesheet" href="css/chat.css"/>
+	  <script src="js/jquery-1.9.1.js"></script>
+	  <script src="/socket.io/socket.io.js"></script>
+	  <script src="js/jquery.validate.js"></script>
+	  <script src="js/cliente.js"></script>
+  </head>
+<body>
+	<div id="contechats">
+		<h1>Chat atenci&oacute;n a clientes</h1>
+		<div id="cerrardefini"><img src="imagenes/cerrarchats.png"/></div>
+		<div class="contefondochat">
+		<div id="fondoconten">
+			<img src="imagenes/chica.png"/>
+			<form id="chatnode" method="post" action="">
+				<div class="rowschat"><p>Por el momento nuestro agentes no estan disponibles. Le invitamos a dejar su mensaje.</p></div>
+				<div class="rowschat"><p>Le contestaremos en el menor tiempo posible.Por su comprensi&oacute;n gracias.</p></div>
+				<div class="rowschat"><textarea name="nombre" id="nombresp" placeholder="Mensaje" class="required" ></textarea></div>
+				<div id="chatahora" class="btnchats">Enviar mensaje</div>
+			</form>	
+				<p>Horarios de atenci&oacute;n Lunes a S&aacute;bado de 9 a 14 y de 16 a 19hrs</p>
+				<div id="redeschat">
+					<a target="_blank" href="http://www.facebook.com/DestinosParhikuni"><img src="imagenes/face.png"/></a>
+					<a target="_blank" href="http://twitter.com/DParhikuni"><img src="imagenes/tweet.png"/></a>
+					<a target="_blank" href="http://www.youtube.com/user/destinosparhikuni"><img src="imagenes/youtube.png"/></<>
+				</div>
+		</div>
+		</div>
+	</div>
+</body>
+</html>

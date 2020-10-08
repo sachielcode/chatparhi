@@ -1,0 +1,392 @@
+var socket = io.connect('http://172.17.1.149:8888/'); //Se hace la conexion con el servidor
+	
+			
+$(document).ready(function(){
+var num_men='';
+$("#envioemails").click(function(){
+	var emails=$('#emails').val();
+	var clave_usuario= $('#claves').val();
+	var nombre_cliente=$('#nombres').val();
+		if(emails!=""){
+		var men_usu =	'<div class="conversacion_us">'; 
+			men_usu +=	'<div class="nombres_pers">'+nombre_cliente+'</div>';
+			men_usu +=	'<div class="calloutUp"><div class="calloutUp21"></div></div>';
+			men_usu +=	'<div class="divContainerUp">'+emails+'</div></div>';
+			
+			$('#areachats > #'+clave_usuario+'_'+nombre_cliente+' > #content_'+clave_usuario).append(men_usu);
+			$("#content_"+clave_usuario).mCustomScrollbar("destroy");
+			$("#content_"+clave_usuario).mCustomScrollbar();
+				var scroll=$('.mCSB_container').attr('class');
+					if(scroll=='mCSB_container'){
+						$(".calloutUp2").css('left','250px');
+						$(".nombres_pers").css('right','20px');
+					}
+			$('#emails').val('');
+			$('#emails').focus();
+			num_men++;
+			socket.emit('sendchat', emails, clave_usuario,num_men);
+		}else{
+			$('#emails').focus();
+		}
+});
+
+$('#emails').keypress(function(e) {
+	if(e.which == 13) {
+		$(this).blur();
+		$('#envioemails').focus().click();
+	}
+});
+
+$("#chatahora").click(function(){
+	$("#chatnode").submit();
+});	
+
+$('#chatnode').validate({
+	submitHandler: function(form) {         		
+		form.submit();
+	}
+});
+
+/*$("#cerrardefini img").click(function(){
+	$("#contechats").css('display','none');
+});*/
+
+/**********************Loguear Reservaciones*************************/
+$('#ingresareserva').click(function(){
+	$("#chatreserva").submit();
+});
+
+$('#chatreserva').validate({
+	submitHandler: function(form) {
+		form.submit();
+	}
+});
+
+$('#enviar_r').click(function(){
+var nombre_reservaciones=$('#person_res').html();
+var men=$("#chatre").val();
+var usuario_conversando=$("#chatre").attr('rel');
+var id=usuario_conversando.split('_');
+	if(men!=""){
+	var mensaje ='<div class="conversacion_us">';
+		mensaje +='<div class="nombres_pers1">'+nombre_reservaciones+'</div><div class="calloutUp1">';
+		mensaje +='<div class="calloutUp2"></div></div><div class="divContainerUp">'+men+'</div></div>';
+		$('#chats_reservacion > #'+usuario_conversando+' > #content_'+id[0]).append(mensaje);
+			$("#content_"+id[0]).mCustomScrollbar("destroy");
+			$("#content_"+id[0]).mCustomScrollbar();
+			$('#chatre').val('');
+			$('#chatre').focus();
+		socket.emit('sendchat_usuario', men, nombre_reservaciones,usuario_conversando);
+			
+		var clave = usuario_conversando.split('_');
+		cuentamensajes(usuario_conversando,clave[0]);
+	}else{
+		$('#chatre').focus();
+	}
+	
+});
+
+$('#chatre').keypress(function(e) {
+	if(e.which == 13) {
+		$(this).blur();
+		$('#enviar_r').focus().click();
+	}
+});
+	$('#cerrar_cliente img').click(function(){
+		alert('hola');
+	});
+	
+	$('#va_ce').click(function(){
+	var id = $(this).attr('rel');
+	var cliente = $(this).attr('alt');
+	$('#valida_cerrar').dialog('destroy');
+	var men=$('#chats_reservacion > #'+id+'_'+cliente+' > #content_'+id).html();
+		socket.emit('guardamensajes', id, men);	
+		socket.emit('desconectar', id, cliente);
+	var id_activo=$('.cliente_activoc').attr('id');
+	if(id_activo==id+'_'+cliente){
+		 $('.cliente_activoc').css('display','none');
+		 $('#chats_reservacion').find('#'+id+'_'+cliente).remove();
+	}
+	});
+});
+	
+	
+	/*document.onkeydown = function(){ 
+	if(window.event && window.event.keyCode == 116) { 
+		
+		alert('has presionado f5');
+	}*/
+
+	//if(window.event && window.event.keyCode == 8){	// cuando el usuario presione el boton retroce no regrese atras //window.status="Por favor, Haga Click en Cerrar Sesión Para Salir del Sistema de Auditoría de Servicios"; 
+	//return false; 
+	//}
+	
+	function sala_reservaciones(nombre_reservaciones){
+		socket.on('connect', function(){
+			socket.emit('adduser', nombre_reservaciones,'r');
+		});
+	}	
+	
+	function dialogo(){
+		$('#denegado').dialog({
+			modal:true,
+			resizable:false,
+			show:"scale",
+			hide:"puff"
+		});
+	}
+	
+	/*actualiza el chat*/
+	socket.on('updatechat', function (username) {
+		$('#conversation').append(username);
+	});
+	/*Ingresa usuario*/
+	function ingresar_chat(nombre_usuario,nombre_reservacion){
+		socket.on('connect', function(){
+			socket.emit('adduser', nombre_usuario,'u',nombre_reservacion);
+		});
+	}
+	
+	socket.on('updaterooms', function(rooms, nombre_usuario){
+		$('#areausucon').empty();
+		$.each(rooms, function(key, value) {
+			if(value == nombre_usuario){
+				socket.emit('menuConectados', value);
+			}else{
+				socket.emit('menuConectados', value);
+			}
+		});
+	});
+
+	socket.on('usersconect', function(rows){
+		$('#areausucon').empty();
+		var ides = rows[0].clave;
+		var client=rows[0].Cliente;
+		for(y in rows){
+			var conectados = rows.length;
+			$('#n_usuarios > #num_con1').html(conectados);
+			var ids = rows[y].clave;
+			var asistente = rows[y].Asistente;
+			var cliente = rows[y].Cliente;
+			var email = rows[y].emailCliente;
+			var asunto = rows[y].asunto;
+			var conectado = rows[y].lConectado;	
+			var html_usucon = '<div id="'+ids+'_'+cliente+'" class="c_conectados">';
+			html_usucon+= '<img src="imagenes/reservaciones/cliente.png" class="imaclient"/>';
+				html_usucon+= 	'<div onclick="switchRoom(\''+cliente+'\',\''+ids+'_'+cliente+'\');" class="info_clientes">';
+				html_usucon+=		'<span class="tiempoconect"></span><br />';
+				html_usucon+=		'<span class="tam17">'+cliente+'</span>';
+				html_usucon+=		'<span class="tam13 asuntito">Asunto:'+asunto+'</span>';
+				html_usucon+=		'<span class="tam13 correo">Correo:'+email+'</span>';
+				html_usucon+=	'</div>';
+				html_usucon+=	'<div class="cerrar_c">';
+				html_usucon+=		'<img src="imagenes/reservaciones/cerrar.png" onclick="cerrar('+ids+',\''+cliente+'\');"/><br />';
+				html_usucon+=		'<div class="estado_ti tiempo_no"></div>'
+				html_usucon+=	'</div>';
+				html_usucon+= '</div>';
+				
+				$('#areausucon').append(html_usucon);
+		}
+		//carga(ides,client);
+	});
+	
+	socket.on('nuevo_usuario',function(nuevousuario){
+		alert(nuevousuario);
+	});
+	
+	socket.on('updatereservaciones', function (username) {
+		$('#nombrereserva').append(username);
+	});
+	
+	/*recibe mensajes*/
+	socket.on('updatemensaje', function(mensaje,rows){
+	var usuario= rows[0].Cliente;
+	var clave= rows[0].clave;
+	
+	var recibemen_reserva =	'<div class="conversacion_us">'; 
+			recibemen_reserva +=	'<div class="nombres_pers">'+usuario+'</div>';
+			recibemen_reserva +=	'<div class="calloutUp"><div class="calloutUp2"></div></div>';
+			recibemen_reserva +=	'<div class="divContainerUp">'+mensaje+'</div></div>';
+	
+	/*var recibemen_reserva = '<div class="conversacion_us">';
+		recibemen_reserva += '<div class="nombres_pers">'+usuario+'</div><div class="calloutUp">';
+		recibemen_reserva += '<div class="calloutUp2"></div></div><div class="divContainerUp">'+mensaje+'</div></div>';*/	
+		
+	var ex= $('div#chats_reservacion').find('#'+clave+'_'+usuario).html();
+	
+		if(ex!=undefined){
+			$('.emailss').each(function(){
+			var id = $(this).attr('id');
+				if(id==clave+'_'+usuario){
+					$('#chats_reservacion > #'+clave+'_'+usuario+' > #content_'+clave).append(recibemen_reserva);
+					$("#content_"+clave).mCustomScrollbar("destroy");
+					$("#content_"+clave).mCustomScrollbar();	
+					cuentamensajes(clave+'_'+usuario,clave);
+				}
+			});
+		}else{
+			var agregar='<div id='+clave+'_'+usuario+' class="emailss"><div id="content_'+clave+'" class="content"></div></div>';
+			$('#chats_reservacion').append(agregar);
+			$('#chats_reservacion > #'+clave+'_'+usuario+' > #content_'+clave).append(recibemen_reserva);
+			$("#content_"+clave).mCustomScrollbar("destroy");
+			$("#content_"+clave).mCustomScrollbar();
+		}
+	});
+	
+	socket.on('updatemensajeausuario', function(men, nombre_reservaciones, usuario_conversando){
+	var usuarioactual=$('#nombres').val();
+	var claveactual=$('#claves').val();
+	var men_usu ='<div class="conversacion_us">'; 
+		men_usu +='<div class="nombres_pers1">'+nombre_reservaciones+'</div>';
+		men_usu += '<div class="calloutUp"><div class="calloutUp2"></div></div>';
+		men_usu +='<div class="divContainerUp">'+men+'</div></div>';
+		if(usuario_conversando==claveactual+'_'+usuarioactual){	
+			$('#areachats > #'+usuario_conversando+' > #content_'+claveactual).append(men_usu);
+				$("#content_"+claveactual).mCustomScrollbar("destroy");
+				$("#content_"+claveactual).mCustomScrollbar();
+					var scroll=$('.mCSB_container').attr('class');
+						if(scroll=='mCSB_container'){
+							$(".calloutUp2").css('left','250px');
+							$(".nombres_pers").css('right','20px');
+						}
+		}
+	});
+	
+	socket.on('totalmensajes',function(clave_usuario, nombre, num_mensaje){
+	var limpiar=$('#areausucon > #'+clave_usuario+'_'+nombre+' > .cerrar_c > .estado_ti');
+		$('.c_conectados').each(function(){
+		var id=$(this).attr('id');
+		
+			if(id==clave_usuario+'_'+nombre){	
+				if(num_mensaje>=3 && num_mensaje<=5){
+					limpiar.removeClass('tiempo_no');
+					limpiar.addClass('tiempo_me');
+				}else if(num_mensaje>5){
+					limpiar.removeClass('tiempo_me');
+					limpiar.addClass('tiempo_ex');
+				}
+				limpiar.html('');
+				//$(num).replaceWith(num_mensaje);
+				limpiar.append(num_mensaje);
+				
+				
+				/*if(num_mensaje==cont){
+					var men=$('#chats_reservacion > #'+clave_usuario+'_'+nombre+' > #content_3').html();
+					//var men_puro=removeHTMLTagFromString("chats_reservacion");
+					socket.emit('guardamensajes', clave_usuario, men);	
+					cont=cont+5;
+				}*/
+			}	
+		});	
+	});
+	
+	function switchRoom(room,id_usuario){
+		$('#chatre').attr('rel',id_usuario);
+		var id_tabla=id_usuario.split('_');
+		$('#chats_reservacion').find('.emailss').css('display','none');
+		$('#chats_reservacion').find('#'+id_usuario).css('display','block');
+		$('#areausucon > #'+id_usuario+' > .cerrar_c > .estado_ti').html('');
+		$('.c_conectados').removeClass('active');
+		$('#'+id_usuario).addClass('active');
+			var nombre=$('#'+id_usuario).find('.tam17').html();
+			var asunto=$('#'+id_usuario).find('.asuntito').html();
+			var correo=$('#'+id_usuario).find('.correo').html();
+			 //$('#'+ides+'_'+clientem).find('.tiempoconect').html(m+':'+s);
+			var tiempo = $('#'+id_usuario).find('.tiempoconect').html();
+			$('.cliente_activoc').find('.tam17').html("");
+			$('.cliente_activoc').find('.asuntito').html("");
+			$('.cliente_activoc').find('.correo').html("");
+			$('.cliente_activoc').find('#tiempo_conect').html("");
+			$('.cliente_activoc').attr('id',id_usuario);
+			$('.cliente_activoc').css('display','block');
+				$('.cliente_activoc').find('.tam17').append(nombre);
+				$('.cliente_activoc').find('.asuntito').append(asunto);
+				$('.cliente_activoc').find('.correo').append(correo);
+				$('.cliente_activoc').find('#tiempo_conect').append(tiempo);
+				var ex= $('div#chats_reservacion').find('#'+id_usuario).html();
+					if(ex==undefined){
+						var agregar='<div id='+id_usuario+' class="emailss"><div id="content_'+id_tabla[0]+'" class="content"></div></div>';
+						$('#chats_reservacion').append(agregar);
+						$("#content_"+id_tabla[0]).mCustomScrollbar("destroy");
+						$("#content_"+id_tabla[0]).mCustomScrollbar();
+						$('#chats_reservacion').find('.emailss').css('display','none');
+						$('#chats_reservacion').find('#'+id_usuario).css('display','block');
+					}
+		socket.emit('switchRoom', room);
+	}
+	
+	/*function removeHTMLTagFromString(id) {  
+        if (document.getElementById && document.getElementById(id)) {  
+            var strHtmlCode = document.getElementById(id).innerHTML;  */
+  
+            /* It replaces escaped brackets with real ones, 
+             i.e. < is replaced with < and > is replaced with > */  
+  
+          /*  strHtmlCode = strHtmlCode.replace(/&(lt|gt);/g,  
+            function (strMatch, p1) {  
+                return (p1 == "'<br /><br />"+"lt"+'<br /><br />') ? "<br /><br /><" : "><br /><br />";  
+            });  
+            var strTagStrippedText = strHtmlCode.replace(/<\/?[^>]+(>|$)/g, "");  
+            document.getElementById(id).innerHTML = strTagStrippedText  
+            
+			return strTagStrippedText;*/
+			//alert("Output text:\n" + strTagStrippedText);  
+    /*    }  
+    }*/
+	
+	function cuentamensajes(usuario_conversando,clave){
+		var numchat=$('#chats_reservacion > #'+usuario_conversando).find('.conversacion_us').length;
+		var men=$('#chats_reservacion > #'+usuario_conversando+' > #content_'+clave).html();
+		
+		var res=numchat%5;
+			if(res==0){
+				socket.emit('guardamensajes', clave, men);	
+			}else{
+				alert('no');
+			}		
+	}
+	
+	function cerrar(id,cliente){
+	$('#va_ce').attr('rel',id);
+	$('#va_ce').attr('alt',cliente);
+		$("#valida_cerrar").dialog({
+			modal:true,
+			resizable:false,
+			show:"scale",
+			hide:"puff"
+		});
+	}
+	
+	/*Cronometro para el tiempo de cada session*/
+	var cronometro;
+ 
+	function detenerse(){
+		clearInterval(cronometro);
+	}
+	
+	function carga(ides,clientem){
+		$('.c_conectados').each(function(){
+		var i=$(this).attr('id');
+			if(i==ides+'_'+clientem){
+			eval("var variables" + ides + " = 0");
+			eval("var variablem" + ides + " = 0");
+			var s=eval("variables" + ides);
+			var m=eval("variablem" + ides);
+				cronometro = setInterval(
+					function(){
+						if(s==60){
+							s=0;
+							m++;
+		 
+							if(m==60){
+							   m=0;
+							}
+						}
+					   $('#'+ides+'_'+clientem).find('.tiempoconect').html(m+':'+s);
+						s++;
+					}
+					,1000);
+			}
+		});
+	}

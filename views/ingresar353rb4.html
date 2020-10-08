@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<link rel="stylesheet" href="css/ingresar.css"/>
+		<link rel="stylesheet" href="js/jquery-ui-1.10.4.custom/css/ui-lightness/jquery-ui-1.10.4.custom.css"/>
+		<script src="js/jquery.js"></script>
+		<script src="js/jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="js/jquery.validate.js"></script>
+		<script src="js/cliente.js"></script>
+	</head>
+<body>
+	<section id="fondoRes">
+		<h1>Chat atenci&oacute;n a clientes</h1>	
+			<div class="contefondochat">
+				<div id="fondoconten">
+					<img src="imagenes/chica.png"/>
+					<form id="chatreserva" action="/loginreserv4" method="post">
+						<div class="rowschat">
+							<input type="text" id="nombresre" class="required" placeholder="Nombre" name="nombresre" />
+						</div>
+						<div class="rowschat">
+							<input type="password" id="passwordre" class="required" placeholder="Contrase&ntilde;a" name="passwordre"/>
+						</div>
+						<div class="rowsenviores">
+							<div id="ingresareserva" class="btnchats">Ingresar</div>
+						</div>
+					</form>
+				</div>
+			</div>
+			<div id="denegado" title="Acceso Denegado" style="display:none;"></div>
+			
+			<input id="errorlogin" type="hidden" value="<%= errors %>" />
+	</section>
+	<script>
+		$(document).ready(function(){
+			var errorlogin=$('#errorlogin').val();
+				if(errorlogin=="error"){
+					dialogo();
+				}
+				
+				if(errorlogin=="sessionocupada"){
+					sessionocupada();
+				}
+		});
+	</script>
+</body>
+</html>

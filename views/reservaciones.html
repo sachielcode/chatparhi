@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<link rel="stylesheet" href="css/reservaciones.css"/>
+		<link rel="stylesheet" href="js/jquery-ui-1.10.4.custom/css/ui-lightness/jquery-ui-1.10.4.custom.css"/>
+		<link rel="stylesheet" href="css/jquery.mCustomScrollbar.css"/>
+		<script src="js/jquery.js"></script>
+		<script src="js/jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="js/jquery.validate.js"></script>
+		<script src="js/cliente.js"></script>
+		<script src="js/jquery.mCustomScrollbar.concat.min.js"></script>
+	</head>
+<body>
+<section id="fondoRes">
+	<div class="rowschat">
+		<h1>Chat de atenci&oacute;n a clientes</h1>	
+	</div>
+	<div id="fondoconten">
+		<div id="usuariosconect">
+			<div id="n_usuarios">
+				<span>Clientes conectados</span><br />
+				<span id="num_con1">0</span>
+			</div>
+			<div class="areamensaje">
+				<div id="content_10" class="content10">
+					<div id="areausucon"></div>
+				</div>
+			</div>
+			<div class="areamensaje">
+				<p>Mensajes de usuarios desconectados</p>
+				<div id="content_11" class="content11">
+					<div id="nuevosmensajes">
+					
+					<!--color:b3116d-->
+					</div>
+				</div>
+			</div>			
+		</div>
+		<div id="areaconversacion">
+			<img src="imagenes/reservaciones/logo-parhik.png" id="logoparhik" />
+			<div id="liston_info">
+				<img id="img_pers" src="imagenes/<%= fotoreservaciones %>" />
+				<div id="infor_reserva"> 
+					<span>Has iniciado sesi&oacute;n como:</span><br />
+					<span id="person_res"><%= nombrereservaciones %></span>
+				</div>
+				<div id="cierresesion">
+					<div id="session_c" class="btnchats">Cerrar sesi&oacute;n</div>
+				</div>
+			</div>
+			<div class="cliente_activoc">
+				<img src="imagenes/reservaciones/cliente.png" class="imaclient"/>
+				<div id="info_cli">
+					<span class="tam17"></span><br />
+					<span class="tam13 asuntito"></span><br />
+					<span class="tam13 correo"></span>
+				</div>
+				
+				<div id="cerrar_cliente"><img src="imagenes/reservaciones/cerrar.png" /></div>
+				<div id="tiempo_conect"></div>
+			</div>
+			<div id="chats_reservacion"></div>
+			<div id="envio_emailreser">
+				<div class="col70c">
+					<textarea name="chatre" id="chatre" placeholder="Mensajes" rel=""></textarea>
+				</div>
+				<div class="col30c">
+					<div id="enviar_r" class="btnchats">Enviar</div>
+				</div>
+			</div>
+		</div>
+				
+		<div id="rooms"></div>
+		<div id="conversation"></div>
+		<div id="contenidoUsu"></div>
+		<div id="nombrereserva"></div>
+	</div>
+	<div id="valida_cerrar" title="Cerrar session" style="display:none;">
+		¿Esta seguro que desea cerrar la sessión con el usuario?
+		<div id="va_ce" class="btnchats">ACEPTAR</div>
+	</div>
+	<div id="ocultamensaje" title="Cerrar mensaje" style="display:none;">
+		¿Esta seguro que desea eliminar el mensaje?
+		<div id="oc_men" class="btnchats" alt="">ACEPTAR</div>
+	</div>
+	<div id="usuariovacio" title="Seleccione Usuario" style="display:none;"></div>
+	<div id="sound"></div>
+	<div id="muestramensajito" title="Mensaje" style="display:none;">
+		<div class="formatofecha" id="fecha_desconecta"></div><br/>
+		<label class="formatotext">Nombre:</label><div class="formatos" id="nombre_desconecta"></div>
+		<label class="formatotext">Correo:</label><div class="formatos" id="correo_desconecta"></div>
+		<label class="formatotext">Mensaje:</label><div class="formatos" id="mensaje_desconecta"></div>	
+	</div>
+	<div class="numensajesxuser" style="display:none;"></div>
+	<input name="aceptacion" id="aceptacion" type="hidden" value="<%= aceptacion %>"/>
+	<input name="claver" id="claver" type="hidden" value="<%= clave %>"/>	
+	<input name="imagen" id="imagen" type="hidden"/>	
+</section>
+<script>
+	socket.on('connect', function(){
+		var claverr=$('#claver').val();
+			socket.emit('adduser', claverr,'r');
+	});		
+</script>
+</body>
+</html>

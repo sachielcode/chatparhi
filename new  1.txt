@@ -1,0 +1,29 @@
+/*socket.on('sala_usuarios',function(nombre_usuario,correo_usuario,asunto_usuario,nombre_reservacion){
+			socket.nombre_usuario = nombre_usuario;
+			socket.room = nombre_usuario;
+			clientes_conect[nombre_usuario] = nombre_usuario;
+			socket.join(nombre_reservacion);
+			rooms[nombre_usuario] = nombre_usuario;
+			socket.emit('updatechat', 'SERVER', 'you have connected to '+ nombre_reservacion);
+			socket.broadcast.to(nombre_reservacion).emit('updatechat', 'SERVER1', nombre_usuario + ' has connected to your room','Su correo es:' +correo_usuario, 'El asunto es:' + asunto_usuario);
+			io.sockets.emit('updaterooms', rooms, nombre_reservacion,correo_usuario,asunto_usuario);	
+		});*/
+		
+		/*socket.on('switchRoom', function(newroom){
+			// leave the current room (stored in session)
+			socket.leave(socket.room);
+			// join new room, received as function parameter
+			socket.join(newroom);
+			socket.emit('updatechat', 'SERVER', 'you have connected to '+ newroom);
+			// sent message to OLD room
+			socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.nombre_usuario+' has left this room');
+			// update socket session room title
+			socket.room = newroom;
+			socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.nombre_usuario+' has joined this room');
+			socket.emit('updaterooms', rooms, newroom);
+		});*/
+		
+		/*obtiene los datos de la url*/
+	/*function getURLParameter(name) {
+		return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
+	}*/

@@ -1,0 +1,318 @@
+.usuconectad{
+	width:100%;
+	height:auto;
+}
+
+#captchat{
+	display:none;
+}
+#recaptcha{
+background:url('../imagenes/recaptcha.png');
+width:41px;
+height:41px;
+float:left;
+cursor:pointer;
+}
+#centracapt{
+width:71%;
+margin:0 auto;
+}
+#centracapt img{
+float:left;
+}
+#centracapt input{
+width:29%;
+height:40px;
+border:2px solid #ca9d96;
+}
+.incorrecto{
+font-size:13px;
+color:#860C0F;
+
+}
+.conversacion_us{
+	width:100%;
+	height:auto;
+}
+
+#contechats{
+	width:370px;
+	height:auto;
+	background:#e65a25;
+	color:#FFF;
+	overflow:hidden;
+}
+
+#contechats h1{
+	margin:0;
+	font-size:25px;
+	padding-left:4px;
+	width:70%;
+	float:left;
+}
+
+#cerrardefini{
+	width:28%;
+	float:left;	
+}
+
+#cerrardefini img{
+float:right;
+margin-top:5px;
+cursor:pointer;
+} 
+
+.contefondochat{
+float:left;
+width:100%;
+}
+#fondoconten{
+	width:96%;
+	height:auto;
+	background:#FFF;
+	color:#575759;
+	margin:0 auto;
+	text-align:center;
+	padding-top:8px;
+	overflow:hidden;
+	margin-bottom:5px;
+	
+}
+
+.rowschat{
+	width:100%;
+	height:60px;
+}
+
+.rowschats1{
+	width:100%;
+	/*height:75px;*/
+}
+.activa_r{
+	display:block;
+}
+
+#nodisponible{
+ display:none;
+}
+
+.rowschat input{
+	width:70%;
+	height:40px;
+	border:2px solid #ca9d96;
+}
+
+.rowsenvio{
+	width:100%;
+	height:auto;
+	float:left;
+}
+
+.btnchats{
+	background: #FF5A19;
+	border-bottom: 3px #717171 solid;
+	display: block;
+	cursor: pointer;
+	color: #FFFFFF;
+	text-align: center;
+	padding-top:8px;
+	font-size: 18px;
+	font-weight: bold;
+	
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+
+#chatahora{
+	width: 186px;
+	height: 32px;
+	margin:0 auto;
+	margin-bottom:7px;
+	display:block;
+}
+
+#enviamensaj{
+	width: 186px;
+	height: 32px;
+	margin:0 auto;
+	margin-bottom:7px;
+	display:none;
+	margin-top:10px;
+	
+}
+
+#mensaje_send{
+	width:70%;
+	height:70px;
+	border:2px solid #ca9d96;
+	margin:0 auto;
+}
+
+#fondoconten p{
+	width:70%;
+	margin:0 auto;
+	/*margin-bottom:7px;*/
+}
+#redeschat{
+	width:51%;
+	margin:0 auto;
+	height:auto;
+	margin-top:5px;
+	
+}
+
+#redeschat img{
+	float:left;
+	margin-left:10px;
+	margin-bottom:10px;
+	cursor:pointer;
+}
+
+label.error{
+	color:#860C0F;
+	font-size:13px;
+	display:block;
+	margin-top:-17px;
+}
+#tituloschats{
+	width:100%;
+	float:left;
+	height:30px;
+}
+
+#liston{
+	height:60px;
+	width:100%;
+	margin:0 auto;
+	padding:0;
+	background:#801214;
+	color:#FFF;
+	position:relative;
+	z-index:10;
+	margin-top:27px;
+}
+
+#liston img{
+	position:relative;
+	left:30px;
+	top:-24px;
+	float:left;
+	border:5px solid #e65a25;
+	border-radius: 50%;
+	overflow:hidden;
+	
+}
+
+#areachats{
+	width:98%;
+	margin:0 auto;
+	height:319px;
+}
+
+#emails{
+	border: 2px solid #ca9d96;
+    height: 53px;
+    width: 94%;
+}
+
+#envioemails{
+	width:84px;
+	height:24px;
+	margin:0 auto;
+	margin-top:8px;
+	margin-bottom:8px;
+}
+
+#inforclient{
+	float:right;
+	width:50%;
+}
+
+.msgs{
+	margin-top:10px;
+	width:100%;
+	float:left;
+	height:auto;
+	margin-bottom:10px;
+}
+
+.calloutUp { 
+height: 0; 
+width: 0; 
+border-bottom: 12px solid #ffffff; 
+border-left: 12px dotted transparent; 
+border-right: 12px dotted transparent; 
+left: 0px; 
+top: 0px; 
+margin-left: 20px; 
+z-index: 10; 
+} 
+
+.calloutUp1 { 
+height: 0; 
+width: 0; 
+border-bottom: 12px solid #ffffff; 
+border-left: 12px dotted transparent; 
+border-right: 12px dotted transparent; 
+left: 0px; 
+top: 0px; 
+margin-left: 550px; 
+z-index: 10; 
+} 
+
+.calloutUp2 { 
+position: relative; 
+left: 270px; 
+top: 25px;
+height: 0; 
+width: 0; 
+border-bottom: 10px solid #ebeaea; 
+border-left: 10px dotted transparent; 
+border-right: 10px dotted transparent; 
+z-index: 11; 
+}
+
+.divContainerUp { 
+background-color: #ebeaea; 
+border: solid 1px #ffffff; 
+position: relative; 
+top: -1px;
+z-index: 9; 
+width:95%; 
+margin:0 auto;
+padding: 4px; 
+border-radius:7px;	
+height:auto;
+margin-top:22px;
+}
+
+.nombres_pers{
+float:left;
+display:block;
+position:relative;
+margin-left:20px;
+}
+
+.nombres_pers1{
+float:right;
+display:block;
+position:relative;
+right:20px;
+}
+
+.calloutUp21{
+position: relative; 
+left: 0; 
+top: 25px;
+height: 0; 
+width: 0; 
+border-bottom: 10px solid #ebeaea; 
+border-left: 10px dotted transparent; 
+border-right: 10px dotted transparent; 
+z-index: 11; 
+}
+
+.content{
+height:319px;
+}
